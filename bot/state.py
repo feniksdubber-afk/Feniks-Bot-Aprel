@@ -1,7 +1,5 @@
-# Bot/state.py
-
-# Foydalanuvchi qaysi bosqichda ekanligini saqlash uchun
+# Foydalanuvchi qaysi bosqichda ekanini saqlash uchun (masalan: 'waiting_pin')
 user_states = {}
 
-# Tizimga kirgan foydalanuvchi ma'lumotlarini saqlash uchun (Xatoni tuzatuvchi qator)
+# Tizimga kirgan foydalanuvchi ma'lumotlarini saqlash uchun
 user_sessions = {}
