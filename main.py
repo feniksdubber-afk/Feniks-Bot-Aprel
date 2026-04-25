@@ -3,11 +3,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import threading
 
-from core import start_bot
+from bot.core import start_bot
 
 if __name__ == "__main__":
     start_bot()
-
+    
 app = FastAPI()
 
 app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
