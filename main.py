@@ -3,7 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import threading
 
-from bot.core import start_bot
+from core import start_bot
+
+if __name__ == "__main__":
+    start_bot()
 
 app = FastAPI()
 
