@@ -1,27 +1,26 @@
 from telebot.types import Message
-from bot.database import cursor
-from bot.state import user_states, user_sessions # Markazlashgan xotira
-from bot.utils import delete_later
+from bot.database import cursor, conn
+from bot.state import user_states, user_sessions
 
 def register(bot):
     @bot.message_handler(commands=['start'])
-    def start(message: Message):
-        # Foydalanuvchi holatini 'waiting_pin'ga o'zgartiramiz
+    def start_command(message: Message):
+        print(f"📩 DEBUG: {message.chat.id} start bosdi")
         user_states[message.chat.id] = 'waiting_pin'
-        bot.send_message(message.chat.id, "👋 PIN kiritishingizni kutmoqdaman...")
+        bot.send_message(message.chat.id, "👋 Xush kelibsiz! Iltimos, PIN-kodingizni kiriting:")
 
     @bot.message_handler(func=lambda m: user_states.get(m.chat.id) == 'waiting_pin')
-    def login(message: Message):
+    def check_pin(message: Message):
         pin = message.text
+        print(f"🔑 DEBUG: PIN tekshirilmoqda: {pin}")
+        
         cursor.execute("SELECT * FROM users WHERE pin=?", (pin,))
         user = cursor.fetchone()
 
         if user:
-            # Endi user['name'] deb yozishimiz mumkin (row_factory tufayli)
+            # user['name'] ishlashi uchun database.py da row_factory bo'lishi shart
             user_sessions[message.chat.id] = dict(user)
             user_states[message.chat.id] = 'logged_in'
-            bot.send_message(message.chat.id, f"✅ Xush kelibsiz {user['name']}")
+            bot.send_message(message.chat.id, f"✅ Salom {user['name']}! Tizimga kirdingiz.")
         else:
-            msg = bot.send_message(message.chat.id, "❌ PIN xato")
-            # Utils'dan foydalanamiz: xabarni 3 soniyadan keyin o'chirish
-            delete_later(bot, message.chat.id, msg.message_id, delay=3)
+            bot.send_message(message.chat.id, "❌ PIN noto'g'ri. Qaytadan urinib ko'ring:")
