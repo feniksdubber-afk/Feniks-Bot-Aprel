@@ -1,25 +1,28 @@
 import telebot
 import os
+import time
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Variables bo'limidan BOT_TOKEN ni oladi
 TOKEN = os.getenv("BOT_TOKEN")
-bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
+# Agar token bo'sh bo'lsa, xato berishi uchun
+if not TOKEN:
+    raise ValueError("❌ XATOLIK: BOT_TOKEN topilmadi! Variables bo'limini tekshiring.")
 
-# Webhookni tozalash (muammolarni oldini olish uchun)
-bot.remove_webhook()
+bot = telebot.TeleBot(TOKEN)
 
-# Handlerlarni ulash (auth.py ni ro'yxatdan o'tkazish)
+# Webhookni tozalash va handlerlarni ulash
 from bot import auth
+bot.remove_webhook()
 auth.register(bot)
 
 def start_bot():
-    try:
-        me = bot.get_me()
-        print(f"✅ Telegram bilan aloqa o'rnatildi! Bot: @{me.username}")
-        print("🚀 Bot polling (xabarlarni kutish) boshlandi...")
-        bot.infinity_polling(skip_pending=True)
-    except Exception as e:
-        print(f"❌ Bot ishga tushishida xatolik: {e}")
+    while True: # Bot o'chib qolsa qayta yonishi uchun
+        try:
+            me = bot.get_me()
+            print(f"✅ BOT TAYYOR: @{me.username}")
+            bot.infinity_polling(skip_pending=True, timeout=60)
+        except Exception as e:
+            print(f"⚠️ Botda uzilish: {e}. 5 soniyadan so'ng qayta urinish...")
+            time.sleep(5)
