@@ -4,21 +4,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Variables bo'limidan BOT_TOKEN ni oladi
 TOKEN = os.getenv("BOT_TOKEN")
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN, parse_mode="HTML")
 
-# Handlerlarni ro'yxatdan o'tkazish
+# Webhookni tozalash (muammolarni oldini olish uchun)
+bot.remove_webhook()
+
+# Handlerlarni ulash (auth.py ni ro'yxatdan o'tkazish)
 from bot import auth
 auth.register(bot)
 
 def start_bot():
     try:
-        # skip_pending=True - bot o'chiq vaqtida kelgan xabarlarni e'tiborsiz qoldiradi
-        # Bu bot yoqilganda "spam" bo'lib ketmasligi uchun kerak
-        print("✅ Bot polling boshlandi...")
+        me = bot.get_me()
+        print(f"✅ Telegram bilan aloqa o'rnatildi! Bot: @{me.username}")
+        print("🚀 Bot polling (xabarlarni kutish) boshlandi...")
         bot.infinity_polling(skip_pending=True)
     except Exception as e:
-        print(f"❌ Botda xatolik: {e}")
-
-if __name__ == "__main__":
-    start_bot()
+        print(f"❌ Bot ishga tushishida xatolik: {e}")
